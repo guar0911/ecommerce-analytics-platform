@@ -1,3 +1,3 @@
 # E-commerce Analytics Platform
 
-Pipeline de Big Data (OLTP → ETL → OLAP) + MLOps + LLM con RAG sobre el data warehouse.
+Big Data pipeline (OLTP → ETL → OLAP) + MLOps + LLM with RAG over the data warehouse.
