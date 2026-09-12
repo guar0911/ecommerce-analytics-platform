@@ -1,0 +1,39 @@
+services:
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.11.1
+    container_name: olist_mlflow
+    restart: unless-stopped
+    ports:
+      - "5002:5000"
+    volumes:
+      # SQLite backend store: keeps experiment/run metadata (params, metrics, tags)
+      - mlflow_db:/mlflow/db
+      # Artifact store: keeps the actual model files, plots, etc.
+      - mlflow_artifacts:/mlflow/artifacts
+    command: >
+      mlflow server
+      --backend-store-uri sqlite:////mlflow/db/mlflow.db
+      --artifacts-destination /mlflow/artifacts
+      --default-artifact-root mlflow-artifacts:/
+      --host 0.0.0.0
+      --port 5000
+      --allowed-hosts "localhost,127.0.0.1,localhost:5002,127.0.0.1:5002,mlflow,mlflow:5000"
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: olist_ml_api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # "mlflow" is the service name above -- Docker's internal DNS resolves
+      # it automatically since both containers share this compose network.
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+    depends_on:
+      - mlflow
+
+volumes:
+  mlflow_db:
+  mlflow_artifacts:

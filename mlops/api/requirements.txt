@@ -1,0 +1,5 @@
+fastapi
+uvicorn[standard]
+mlflow
+scikit-learn==1.7.2
+pandas
