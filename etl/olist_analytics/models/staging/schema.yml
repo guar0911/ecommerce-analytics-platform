@@ -1,0 +1,145 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: Cleaned customers table from the OLTP.
+    columns:
+      - name: customer_id
+        description: Unique per order-level customer record (see note on customer_unique_id).
+        tests:
+          - unique
+          - not_null
+      - name: customer_unique_id
+        description: Identifies the actual person across multiple orders.
+        tests:
+          - not_null
+
+  - name: stg_sellers
+    description: Cleaned sellers table from the OLTP.
+    columns:
+      - name: seller_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_product_category_translation
+    description: Portuguese-to-English product category name lookup.
+    columns:
+      - name: product_category_name
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_products
+    description: Cleaned products catalog from the OLTP.
+    columns:
+      - name: product_id
+        tests:
+          - unique
+          - not_null
+      - name: product_category_name
+        description: Nullable -- a small number of products have no category assigned.
+        tests:
+          - relationships:
+              arguments:
+                to: ref('stg_product_category_translation')
+                field: product_category_name
+
+  - name: stg_geolocation
+    description: >
+      Raw zip-code-to-coordinates lookup. Intentionally not deduplicated here --
+      multiple lat/lng rows per zip_code_prefix are expected; aggregation happens
+      downstream in intermediate/marts.
+    columns:
+      - name: zip_code_prefix
+        tests:
+          - not_null
+      - name: lat
+        tests:
+          - not_null
+      - name: lng
+        tests:
+          - not_null
+
+  - name: stg_orders
+    description: Cleaned orders table from the OLTP.
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_customers')
+                field: customer_id
+      - name: order_status
+        tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - delivered
+                  - shipped
+                  - canceled
+                  - unavailable
+                  - invoiced
+                  - processing
+                  - created
+                  - approved
+
+  - name: stg_order_items
+    description: Cleaned order line items from the OLTP.
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_orders')
+                field: order_id
+      - name: product_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_products')
+                field: product_id
+      - name: seller_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_sellers')
+                field: seller_id
+
+  - name: stg_order_payments
+    description: Cleaned order payments from the OLTP.
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_orders')
+                field: order_id
+
+  - name: stg_order_reviews
+    description: Cleaned order reviews from the OLTP.
+    columns:
+      - name: review_id
+        tests:
+          - not_null
+      - name: order_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_orders')
+                field: order_id
+      - name: review_score
+        tests:
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4, 5]

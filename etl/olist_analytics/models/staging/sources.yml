@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: olist_oltp
+    description: Raw OLTP tables loaded from the Olist e-commerce dataset.
+    schema: public
+    tables:
+      - name: customers
+      - name: sellers
+      - name: products
+      - name: product_category_translation
+      - name: geolocation
+      - name: orders
+      - name: order_items
+      - name: order_payments
+      - name: order_reviews
