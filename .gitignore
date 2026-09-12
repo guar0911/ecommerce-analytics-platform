@@ -1,22 +1,36 @@
-# Python
+# --- Python ---
 __pycache__/
 *.pyc
+*.pyo
 .venv/
 venv/
+*.egg-info/
 
-# Env / secrets
+# --- Secrets / environment variables ---
+# Never commit actual .env files -- only the .env.example templates
 .env
-*.env.local
+.env.*
+!.env.example
+!.env.*.example
 
-# Docker
-*.log
+# --- Raw data (downloaded from Kaggle, not ours to redistribute, and huge) ---
+oltp/raw_data/
 
-# dbt
-target/
-dbt_packages/
+# --- dbt generated artifacts ---
+etl/olist_analytics/target/
+etl/olist_analytics/dbt_packages/
+etl/olist_analytics/logs/
+etl/olist_analytics/.user.yml
 
-# MLflow
-mlruns/
+# --- Airflow generated logs ---
+etl/logs/*
+!etl/logs/.gitkeep
 
-# OS
+# --- MLflow / monitoring generated reports (regenerable, not source) ---
+mlops/monitoring_reports/
+mlflow.db
+
+# --- OS / editor ---
 .DS_Store
+.vscode/
+.idea/
