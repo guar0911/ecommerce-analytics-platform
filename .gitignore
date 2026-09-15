@@ -30,8 +30,10 @@ etl/logs/*
 mlops/monitoring_reports/
 mlflow.db
 
+# --- Chroma vector store (regenerable binary index, not source) ---
+llm_rag/chroma_db/
+
 # --- OS / editor ---
 .DS_Store
 .vscode/
 .idea/
-guia.md
