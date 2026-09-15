@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  python-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install ruff
+        run: pip install ruff
+      - name: Lint (syntax errors + undefined names only)
+        run: ruff check --select=E9,F oltp/ mlops/ llm_rag/
+
+  dbt-parse:
+    runs-on: ubuntu-latest
+    env:
+      # dbt parse validates project structure/Jinja without connecting to a
+      # real database -- these are just placeholders so profiles.yml resolves.
+      POSTGRES_HOST: localhost
+      POSTGRES_USER: ci_dummy
+      POSTGRES_PASSWORD: ci_dummy
+      POSTGRES_DB: ci_dummy
+      POSTGRES_PORT: "5432"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dbt
+        run: pip install dbt-postgres==1.11.0
+      - name: dbt parse
+        working-directory: etl/olist_analytics
+        run: dbt parse --profiles-dir .
+
+  docker-build-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build ML API image
+        run: docker build -t olist-ml-api:ci ./mlops/api
