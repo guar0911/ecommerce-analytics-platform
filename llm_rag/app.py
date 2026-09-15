@@ -10,6 +10,17 @@ from pathlib import Path
 
 import streamlit as st
 
+# On Streamlit Community Cloud there's no .env file -- secrets are configured
+# in the app's dashboard instead. This bridges them into os.environ so
+# QueryEngine's dotenv-based loading keeps working unchanged either way.
+import os
+
+try:
+    for key, value in st.secrets.items():
+        os.environ.setdefault(key, str(value))
+except Exception:
+    pass  # no secrets.toml locally -- llm_rag/.env handles it instead
+
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 from query_engine import QueryEngine  # noqa: E402
 
