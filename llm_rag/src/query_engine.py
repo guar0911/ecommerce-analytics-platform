@@ -27,6 +27,7 @@ from sqlalchemy.engine import URL
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 CHROMA_DIR = PROJECT_ROOT / "llm_rag" / "chroma_db"
+SCHEMA_CATALOG_PATH = PROJECT_ROOT / "llm_rag" / "schema_catalog.json"
 COLLECTION_NAME = "schema_catalog"
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 CLAUDE_MODEL = "claude-sonnet-5"
@@ -88,7 +89,13 @@ class QueryEngine:
         self.embedder = SentenceTransformer(EMBEDDING_MODEL)
 
         chroma_client = chromadb.PersistentClient(path=str(CHROMA_DIR))
-        self.collection = chroma_client.get_collection(COLLECTION_NAME)
+        try:
+            self.collection = chroma_client.get_collection(COLLECTION_NAME)
+        except Exception:
+            # First run in a fresh environment (e.g. Streamlit Cloud) --
+            # chroma_db/ is gitignored (regenerable binary index), so build
+            # it here from schema_catalog.json, which IS committed to git.
+            self.collection = self._build_collection(chroma_client)
 
         db_url = URL.create(
             "postgresql+psycopg2",
@@ -102,6 +109,24 @@ class QueryEngine:
             else {},
         )
         self.engine = create_engine(db_url)
+
+    def _build_collection(self, chroma_client):
+        import json
+
+        catalog = json.loads(SCHEMA_CATALOG_PATH.read_text())
+        collection = chroma_client.create_collection(COLLECTION_NAME)
+        texts = [table["text_chunk"] for table in catalog]
+        embeddings = self.embedder.encode(texts).tolist()
+        collection.add(
+            ids=[table["table_name"] for table in catalog],
+            embeddings=embeddings,
+            documents=texts,
+            metadatas=[
+                {"schema": table["schema"], "table_name": table["table_name"]}
+                for table in catalog
+            ],
+        )
+        return collection
 
     # -- Step 1: retrieval -------------------------------------------------
 
