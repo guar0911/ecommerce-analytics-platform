@@ -9,7 +9,6 @@ retraining and promoting a new champion never requires touching this file.
 """
 
 from contextlib import asynccontextmanager
-from typing import Optional
 import os
 
 import mlflow
