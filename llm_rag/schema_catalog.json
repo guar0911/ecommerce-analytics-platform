@@ -1,0 +1,290 @@
+[
+  {
+    "table_name": "dim_product",
+    "schema": "analytics",
+    "description": "One row per product, with English category name resolved.",
+    "columns": [
+      {
+        "name": "product_id",
+        "type": "character varying(32)",
+        "description": ""
+      },
+      {
+        "name": "product_category_name",
+        "type": "character varying(100)",
+        "description": ""
+      },
+      {
+        "name": "product_category_name_en",
+        "type": "character varying(100)",
+        "description": ""
+      },
+      {
+        "name": "product_weight_g",
+        "type": "integer",
+        "description": ""
+      },
+      {
+        "name": "product_length_cm",
+        "type": "integer",
+        "description": ""
+      },
+      {
+        "name": "product_height_cm",
+        "type": "integer",
+        "description": ""
+      },
+      {
+        "name": "product_width_cm",
+        "type": "integer",
+        "description": ""
+      },
+      {
+        "name": "product_photos_qty",
+        "type": "smallint",
+        "description": ""
+      }
+    ],
+    "text_chunk": "Table: analytics.dim_product\nDescription: One row per product, with English category name resolved.\nColumns:\n  - product_id (character varying(32))\n  - product_category_name (character varying(100))\n  - product_category_name_en (character varying(100))\n  - product_weight_g (integer)\n  - product_length_cm (integer)\n  - product_height_cm (integer)\n  - product_width_cm (integer)\n  - product_photos_qty (smallint)"
+  },
+  {
+    "table_name": "dim_geography",
+    "schema": "analytics",
+    "description": "One row per zip code, with representative lat/lng/city/state.",
+    "columns": [
+      {
+        "name": "zip_code_prefix",
+        "type": "character varying(5)",
+        "description": ""
+      },
+      {
+        "name": "lat",
+        "type": "numeric",
+        "description": ""
+      },
+      {
+        "name": "lng",
+        "type": "numeric",
+        "description": ""
+      },
+      {
+        "name": "city",
+        "type": "character varying",
+        "description": ""
+      },
+      {
+        "name": "state",
+        "type": "bpchar",
+        "description": ""
+      }
+    ],
+    "text_chunk": "Table: analytics.dim_geography\nDescription: One row per zip code, with representative lat/lng/city/state.\nColumns:\n  - zip_code_prefix (character varying(5))\n  - lat (numeric)\n  - lng (numeric)\n  - city (character varying)\n  - state (bpchar)"
+  },
+  {
+    "table_name": "dim_customer",
+    "schema": "analytics",
+    "description": "One row per customer.",
+    "columns": [
+      {
+        "name": "customer_id",
+        "type": "character varying(32)",
+        "description": ""
+      },
+      {
+        "name": "customer_unique_id",
+        "type": "character varying(32)",
+        "description": ""
+      },
+      {
+        "name": "zip_code_prefix",
+        "type": "character varying(5)",
+        "description": ""
+      },
+      {
+        "name": "city",
+        "type": "character varying(100)",
+        "description": ""
+      },
+      {
+        "name": "state",
+        "type": "character(2)",
+        "description": ""
+      }
+    ],
+    "text_chunk": "Table: analytics.dim_customer\nDescription: One row per customer.\nColumns:\n  - customer_id (character varying(32))\n  - customer_unique_id (character varying(32))\n  - zip_code_prefix (character varying(5))\n  - city (character varying(100))\n  - state (character(2))"
+  },
+  {
+    "table_name": "dim_seller",
+    "schema": "analytics",
+    "description": "One row per seller.",
+    "columns": [
+      {
+        "name": "seller_id",
+        "type": "character varying(32)",
+        "description": ""
+      },
+      {
+        "name": "zip_code_prefix",
+        "type": "character varying(5)",
+        "description": ""
+      },
+      {
+        "name": "city",
+        "type": "character varying(100)",
+        "description": ""
+      },
+      {
+        "name": "state",
+        "type": "character(2)",
+        "description": ""
+      }
+    ],
+    "text_chunk": "Table: analytics.dim_seller\nDescription: One row per seller.\nColumns:\n  - seller_id (character varying(32))\n  - zip_code_prefix (character varying(5))\n  - city (character varying(100))\n  - state (character(2))"
+  },
+  {
+    "table_name": "dim_date",
+    "schema": "analytics",
+    "description": "One row per calendar day, spanning the full range of orders.",
+    "columns": [
+      {
+        "name": "date_day",
+        "type": "date",
+        "description": ""
+      },
+      {
+        "name": "year",
+        "type": "integer",
+        "description": ""
+      },
+      {
+        "name": "month",
+        "type": "integer",
+        "description": ""
+      },
+      {
+        "name": "month_name",
+        "type": "text",
+        "description": ""
+      },
+      {
+        "name": "day_of_month",
+        "type": "integer",
+        "description": ""
+      },
+      {
+        "name": "day_of_week",
+        "type": "integer",
+        "description": ""
+      },
+      {
+        "name": "quarter",
+        "type": "integer",
+        "description": ""
+      },
+      {
+        "name": "is_weekend",
+        "type": "boolean",
+        "description": ""
+      }
+    ],
+    "text_chunk": "Table: analytics.dim_date\nDescription: One row per calendar day, spanning the full range of orders.\nColumns:\n  - date_day (date)\n  - year (integer)\n  - month (integer)\n  - month_name (text)\n  - day_of_month (integer)\n  - day_of_week (integer)\n  - quarter (integer)\n  - is_weekend (boolean)"
+  },
+  {
+    "table_name": "fact_orders",
+    "schema": "analytics",
+    "description": "One row per order line item. See the model's SQL comment for an important caveat about order_total_payment_value being repeated across items of the same order -- never SUM it directly.\n",
+    "columns": [
+      {
+        "name": "order_id",
+        "type": "character varying(32)",
+        "description": ""
+      },
+      {
+        "name": "order_item_id",
+        "type": "smallint",
+        "description": ""
+      },
+      {
+        "name": "customer_id",
+        "type": "character varying(32)",
+        "description": ""
+      },
+      {
+        "name": "product_id",
+        "type": "character varying(32)",
+        "description": ""
+      },
+      {
+        "name": "seller_id",
+        "type": "character varying(32)",
+        "description": ""
+      },
+      {
+        "name": "order_date",
+        "type": "date",
+        "description": ""
+      },
+      {
+        "name": "order_status",
+        "type": "character varying(20)",
+        "description": ""
+      },
+      {
+        "name": "order_purchase_timestamp",
+        "type": "timestamp without time zone",
+        "description": ""
+      },
+      {
+        "name": "order_delivered_customer_date",
+        "type": "timestamp without time zone",
+        "description": ""
+      },
+      {
+        "name": "order_estimated_delivery_date",
+        "type": "timestamp without time zone",
+        "description": ""
+      },
+      {
+        "name": "order_total_payment_value",
+        "type": "numeric",
+        "description": ""
+      },
+      {
+        "name": "payment_methods_count",
+        "type": "bigint",
+        "description": ""
+      },
+      {
+        "name": "max_installments",
+        "type": "smallint",
+        "description": ""
+      },
+      {
+        "name": "price",
+        "type": "numeric(10,2)",
+        "description": ""
+      },
+      {
+        "name": "freight_value",
+        "type": "numeric(10,2)",
+        "description": ""
+      },
+      {
+        "name": "item_total",
+        "type": "numeric",
+        "description": ""
+      },
+      {
+        "name": "product_category_name_en",
+        "type": "character varying(100)",
+        "description": ""
+      },
+      {
+        "name": "seller_state",
+        "type": "character(2)",
+        "description": ""
+      }
+    ],
+    "text_chunk": "Table: analytics.fact_orders\nDescription: One row per order line item. See the model's SQL comment for an important caveat about order_total_payment_value being repeated across items of the same order -- never SUM it directly.\n\nColumns:\n  - order_id (character varying(32))\n  - order_item_id (smallint)\n  - customer_id (character varying(32))\n  - product_id (character varying(32))\n  - seller_id (character varying(32))\n  - order_date (date)\n  - order_status (character varying(20))\n  - order_purchase_timestamp (timestamp without time zone)\n  - order_delivered_customer_date (timestamp without time zone)\n  - order_estimated_delivery_date (timestamp without time zone)\n  - order_total_payment_value (numeric)\n  - payment_methods_count (bigint)\n  - max_installments (smallint)\n  - price (numeric(10,2))\n  - freight_value (numeric(10,2))\n  - item_total (numeric)\n  - product_category_name_en (character varying(100))\n  - seller_state (character(2))"
+  }
+]
