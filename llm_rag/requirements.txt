@@ -2,3 +2,7 @@ streamlit
 anthropic
 chromadb
 sentence-transformers
+sqlalchemy
+psycopg2-binary
+pandas
+python-dotenv
